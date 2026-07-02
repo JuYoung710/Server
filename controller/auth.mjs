@@ -26,8 +26,19 @@ export async function signup(req,res) {
 }
 
 // 로그인
-export async function login(req,res) {
-
+export async function  login(req,res) {
+    const { userid, password } = req.body
+    const user = await authRepository.findByUserid(userid)  
+    // userid가 있는지
+    if(!user){
+        return res.status(401).json({ message: "아이디 또는 비밀번호 확인"})
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password) 
+    if(!isValidPassword){
+        return res.status(401).json({ message: "아이디 또는 비밀번호 확인"})
+    }
+        const token = await createJwtToken(user.id)
+        res.status(200).json({ token, user })
 }
 
 // 로그인 유지 체크
@@ -37,6 +48,6 @@ export async function me(req, res) {
 
 async function createJwtToken(id) {
     return jwt.sign({ id }, config.jwt.secretKey, {
-        expriesIn: config.jwt.expiresInsec
+        expiresIn: config.jwt.expiresInsec
     })
 }
