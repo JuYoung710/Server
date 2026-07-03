@@ -22,3 +22,8 @@ function mapOptionalUser(user) {
     return user ? { ...user, id: user._id.toString() } : user
 }
 // _id 는 Object의 id를 의미
+
+// userid가 아닌 Object id
+export async function findById(id) {
+    return getUsers().find({ _id: new ObjectId(id) }).next().then(mapOptionalUser)
+}
